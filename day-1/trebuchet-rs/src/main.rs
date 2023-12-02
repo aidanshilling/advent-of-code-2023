@@ -1,59 +1,70 @@
-use std::{fs, collections::HashMap};
+use std::{collections::HashMap, fs};
 
 fn main() {
     let file_name = "input.txt";
-    let contents = fs::read_to_string(file_name)
-        .expect("Should have been able to read file");
+    let contents = fs::read_to_string(file_name).expect("Should have been able to read file");
 
-    // TODO: Add mapping for string version of numbers
+    // This maps the string form of a number to an i32
     // Ex. "five" -> 5
-    static NUMBERS: &[&str; 10] = &[
-       "zero", 
-       "one", 
-       "two", 
-       "three", 
-       "four", 
-       "five", 
-       "six", 
-       "seven", 
-       "eight", 
-       "nine", 
-    ];
+    let number_map: HashMap<&str, &str> = vec![
+        ("zero", "0"),
+        ("one", "1"),
+        ("two", "2"),
+        ("three", "3"),
+        ("four", "4"),
+        ("five", "5"),
+        ("six", "6"),
+        ("seven", "7"),
+        ("eight", "8"),
+        ("nine", "9"),
+        ("0", "0"),
+        ("1", "1"),
+        ("2", "2"),
+        ("3", "3"),
+        ("4", "4"),
+        ("5", "5"),
+        ("6", "6"),
+        ("7", "7"),
+        ("8", "8"),
+        ("9", "9"),
+    ]
+    .into_iter()
+    .collect();
 
-    let number_map: HashMap<&str, i32> = vec![
-        ("zero", 0),
-        ("one", 1),
-        ("two", 2),
-        ("three", 3),
-        ("four", 4),
-        ("five", 5),
-        ("six", 6),
-        ("seven", 7),
-        ("eight", 8),
-        ("nine", 9)
-    ].into_iter().collect();
-
-    let mut numbers: Vec<i32> = vec![];
+    let mut sum = 0;
 
     for line in contents.split("\n") {
-        
-        let _numbers: String = line
-            .chars()
-            .filter(|x| x.is_digit(10))
-            .collect();
-
-        if _numbers.len() > 1 {
-            let _final_char_idx = _numbers.len() - 1;
-            let _result = [&_numbers[0..1], &_numbers[_final_char_idx..]].to_owned().join("");
-            println!("{_result}");
-            numbers.push(_result.parse::<i32>().unwrap());
-        } else if _numbers.len() > 0 {
-            let _result = &_numbers[0..1].to_owned();
-            println!("{_result}");
-            numbers.push(_result.parse::<i32>().unwrap());
+        println!("{line}");
+        let mut values: Vec<&str> = vec![];
+        for idx in 0..line.len() {
+            let mut word: Vec<char> = vec![];
+            for next in line.chars().skip(idx) {
+                word.push(next);
+                let cur_word: String = word.iter().collect();
+                let word_str = cur_word.as_str();
+                match number_map.get(word_str) {
+                    Some(&value) => {
+                        print!("{word_str} ");
+                        values.push(value);
+                        break;
+                    }
+                    None => continue,
+                }
+            }
         }
+        println!();
+        if values.len() > 1 {
+            let result_str: String = values[0].to_string() + &values[values.len() - 1].to_string();
+            println!("{result_str}");
+            let result: i32 = result_str.parse::<i32>().unwrap();
+            sum = sum + result;
+        } else if values.len() > 0 {
+            let result_str: String = values[0].to_string() + &values[0].to_string();
+            println!("{result_str}");
+            let result: i32 = result_str.parse::<i32>().unwrap();
+            sum = sum + result;
+        }
+        println!("Current sum: {sum}");
     }
-
-    let total: i32 = numbers.iter().sum();
-    println!("{total}");
+    println!("Done.");
 }
