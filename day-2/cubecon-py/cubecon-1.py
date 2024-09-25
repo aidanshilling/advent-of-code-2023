@@ -6,12 +6,10 @@ def parse_round(round):
         'blue': 14
     }
 
-    round = round.replace(',', '')
-    round_split = round.lstrip().strip().split(' ')
-    print(round)
-    for i in range(0, len(round_split), 2):
-        print(round_split)
-        if int(round_split[i]) > key[round_split[i+1]]:
+    rolls = round.split(',')
+    for roll in rolls:
+        count, color = roll.lstrip().strip().split(' ')
+        if int(count) > key[color]:
             return False
     return True
 
@@ -24,13 +22,11 @@ if __name__ == "__main__":
             game = line.strip()
             id, rounds = game.split(':')
             id = id.split(' ')[1]
-            print("{} - {}".format(id, rounds))
             for round in rounds.split(';'):
-                print(round)
                 if not parse_round(round):
                     bad_game = True
                     break
             if not bad_game:
                 good_games.append(int(id))
 
-        print(sum(good_games))
+        print("Part 1 answer: {}".format(sum(good_games)))
