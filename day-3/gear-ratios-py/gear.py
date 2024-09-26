@@ -31,9 +31,9 @@ def read_schematic_into_matrix(schematic):
                             'value': char
                         })
                 elif char != '.':
-                    symbols["({}, {})".format(i, j)] = True
+                    symbols["({}, {})".format(i, j)] = (True, char)
                 else:
-                    symbols["({}, {})".format(i, j)] = False
+                    symbols["({}, {})".format(i, j)] = (False, '')
                 row.append(char)
                 j += 1
             matrix.append(row)
@@ -69,28 +69,46 @@ def get_surrounding_coords(num, w, h):
 
 def find_valid_part_numbers(matrix, numbers, symbols):
 
-    # [i-1,j], [i+1,j], [i, j-1], [i, j+1],
-    # [i-1, j-1], [i-1, j+1], [i+1, j-1], [i+1, j+1]
     good_numbers = []
+    gears = {}
     h = len(matrix)
     w = len(matrix[0])
 
     for num in numbers:
-        # will need to account for being on the edges of the matrix
-        # and when two numbers are next to eachother in the same row
-        # (they would be part of the same number)
         coords = get_surrounding_coords(num, w, h)
         for coord in coords:
-            if symbols["({}, {})".format(coord[0], coord[1])]:
+            key = "({}, {})".format(coord[0], coord[1])
+            sym = symbols[key]
+            if sym[0]:
+                if sym[1] == '*' and key in gears:
+                    gears[key]['numbers'].append(int(num['value']))
+                else:
+                    gears[key] = {
+                        'i': coord[0],
+                        'j': coord[1],
+                        'numbers': [int(num['value'])]
+                    }
                 good_numbers.append(int(num['value']))
 
-    return good_numbers
+    return good_numbers, gears
+
+
+def check_gears(gears):
+    ratios = []
+    for gear in gears:
+        numbers = gears[gear]['numbers']
+        if len(numbers) == 2:
+            ratios.append(numbers[0] * numbers[1])
+    return ratios
 
 
 if __name__ == "__main__":
 
     matrix, numbers, symbols = read_schematic_into_matrix('input')
-    good_numbers = find_valid_part_numbers(matrix, numbers, symbols)
+    good_numbers, gears = find_valid_part_numbers(matrix, numbers, symbols)
+    ratios = check_gears(gears)
 
-    answer = sum(good_numbers)
-    print("P1 Answer: {}".format(answer))
+    answer1 = sum(good_numbers)
+    answer2 = sum(ratios)
+    print("P1 Answer: {}".format(answer1))
+    print("P2 Answer: {}".format(answer2))
