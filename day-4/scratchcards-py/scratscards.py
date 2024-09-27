@@ -20,7 +20,7 @@ def process_card(card):
 def process_card_stack():
     total_cards = 0
     copy_index = {}
-    with open('input-test', 'r') as f:
+    with open('input', 'r') as f:
         for line in f:
             total_cards += 1
             card, numbers = line.strip().lstrip().split(':')
@@ -36,8 +36,7 @@ def process_card_stack():
                     copy_index[k] += v
                 else:
                     copy_index[k] = v
-            print(id, copy_index)
-    print(total_cards)
+    return total_cards
 
 
 def get_full_total():
@@ -59,8 +58,8 @@ def get_full_total():
 
 if __name__ == "__main__":
 
-    total = get_full_total()
-    process_card_stack()
+    answer1 = get_full_total()
+    answer2 = process_card_stack()
 
-    answer1 = total
     print("P1 Answer: {}".format(answer1))
+    print("P2 Answer: {}".format(answer2))
