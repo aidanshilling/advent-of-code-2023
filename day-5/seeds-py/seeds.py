@@ -33,33 +33,25 @@ def create_map(name, data):
     return result
 
 
-def resolve_map(map):
-    result = {}
-    for line in map['lines']:
-        source = line['source']
-        dest = line['dest']
-        length = line['length']
-        for i in range(0, length):
-            result[source + i] = dest + i
-    return result
-
-
-def resolve_almanac(almanac):
-    result = []
-    for key in almanac:
-        if key == 'seeds':
-            continue
-        m = resolve_map(almanac[key])
-        result.append(m)
-    return result
-
-
-def locate_seeds(seeds, map_list):
+def locate_seeds(almanac):
+    seeds = almanac['seeds']
     result = {'location_list': [], 'location_map': []}
     for seed in seeds:
         val = seed
-        for m in map_list:
-            val = m[val] if m.get(val) else val
+        for key in almanac:
+            if key == 'seeds':
+                continue
+            for line in almanac[key]['lines']:
+                source = line['source']
+                dest = line['dest']
+                length = line['length']
+
+                # print(val, source, source + length)
+                if val >= source and val < (source + length):
+                    # print("{} {} - Found".format(seed, key))
+                    dist = val - source
+                    val = dest + dist
+                    break
         result['location_map'].append({
             'seed': seed,
             'location': val
@@ -70,8 +62,7 @@ def locate_seeds(seeds, map_list):
 
 if __name__ == "__main__":
     almanac = parse_input('input')
-    map_list = resolve_almanac(almanac)
-    location_map = locate_seeds(almanac['seeds'], map_list)
+    location_map = locate_seeds(almanac)
 
     answer1 = min(location_map['location_list'])
     print("P1 answer: {}".format(answer1))
